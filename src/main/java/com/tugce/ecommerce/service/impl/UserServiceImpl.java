@@ -1,0 +1,73 @@
+package com.tugce.ecommerce.service.impl;
+
+import com.tugce.ecommerce.dto.UserRequestDTO;
+import com.tugce.ecommerce.dto.UserResponseDTO;
+import com.tugce.ecommerce.entity.User;
+import com.tugce.ecommerce.mapper.UserMapper;
+import com.tugce.ecommerce.repository.UserRepository;
+import com.tugce.ecommerce.service.UserService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public UserServiceImpl(
+            UserRepository userRepository,
+            UserMapper userMapper){
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public UserResponseDTO saveUser(UserRequestDTO userRequestDTO) {
+        User user = userMapper.toEntity(userRequestDTO);
+        user.setRole("CUSTOMER");
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponseDTO(savedUser);
+    }
+
+    @Override
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public UserResponseDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı Bulunamadı."));
+        return userMapper.toResponseDTO(user);
+    }
+
+    @Override
+    public UserResponseDTO updateUser(Long id, UserRequestDTO userRequestDTO) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+        existingUser.setFirstName(userRequestDTO.getFirstName());
+        existingUser.setLastName(userRequestDTO.getLastName());
+        existingUser.setEmail(userRequestDTO.getEmail());
+        existingUser.setPassword(userRequestDTO.getPassword());
+        existingUser.setPhoneNumber(userRequestDTO.getPhoneNumber());
+        existingUser.setAddress(userRequestDTO.getAddress());
+
+        User updatedUser = userRepository.save(existingUser);
+        return userMapper.toResponseDTO(updatedUser);
+
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+
+        userRepository.delete(user);
+    }
+
+}
