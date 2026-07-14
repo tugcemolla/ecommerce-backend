@@ -7,6 +7,7 @@ import com.tugce.ecommerce.mapper.UserMapper;
 import com.tugce.ecommerce.repository.UserRepository;
 import com.tugce.ecommerce.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -14,17 +15,22 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(
             UserRepository userRepository,
-            UserMapper userMapper){
+            UserMapper userMapper, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserResponseDTO saveUser(UserRequestDTO userRequestDTO) {
         User user = userMapper.toEntity(userRequestDTO);
+        user.setPassword(
+                passwordEncoder.encode(userRequestDTO.getPassword())
+        );
         user.setRole("CUSTOMER");
         User savedUser = userRepository.save(user);
         return userMapper.toResponseDTO(savedUser);
@@ -52,7 +58,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setFirstName(userRequestDTO.getFirstName());
         existingUser.setLastName(userRequestDTO.getLastName());
         existingUser.setEmail(userRequestDTO.getEmail());
-        existingUser.setPassword(userRequestDTO.getPassword());
+        existingUser.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         existingUser.setPhoneNumber(userRequestDTO.getPhoneNumber());
         existingUser.setAddress(userRequestDTO.getAddress());
 
