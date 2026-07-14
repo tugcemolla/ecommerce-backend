@@ -28,8 +28,10 @@ public class ProductMapper {
     responseDTO.setPrice(product.getPrice());
     responseDTO.setStock(product.getStock());
     responseDTO.setImageUrl(product.getImageUrl());
-    responseDTO.setCategoryId((product.getCategory().getId()));
-    responseDTO.setCategoryName(product.getCategory().getName());
+    if (product.getCategory() != null) {
+            responseDTO.setCategoryId(product.getCategory().getId());
+            responseDTO.setCategoryName(product.getCategory().getName());
+        }
 
     return responseDTO;
     }

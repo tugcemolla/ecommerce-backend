@@ -1,11 +1,11 @@
 package com.tugce.ecommerce.security;
 
 import com.tugce.ecommerce.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -13,17 +13,23 @@ import java.util.Date;
 
 @Service
 public class JwtService {
+
     private static final String SECRET_KEY =
             "ecommerce-projesi-icin-en-az-32-karakter-uzunlugunda-gizli-anahtar";
-    private static final long EXPIRATION_TIME =  1000L * 60 * 60 * 24;
-    private SecretKey getSigninKey(){
+
+    private static final long EXPIRATION_TIME =
+            1000L * 60 * 60 * 24;
+
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(
                 SECRET_KEY.getBytes(StandardCharsets.UTF_8)
         );
     }
 
-    public String generateToken(User user){
+    public String generateToken(User user) {
+
         Date now = new Date();
+
         Date expirationDate =
                 new Date(now.getTime() + EXPIRATION_TIME);
 
@@ -33,28 +39,47 @@ public class JwtService {
                 .claim("role", user.getRole())
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .signWith(getSigninKey())
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    public Claims extractAllClaims(String token){
+    public Claims extractAllClaims(String token) {
+
         return Jwts.parser()
-                .verifyWith(getSigninKey())
+                .verifyWith(getSigningKey())
                 .build()
-                .parseEncryptedClaims(token)
+                .parseSignedClaims(token)
                 .getPayload();
     }
 
-    public String exractEmail(String token){
+    public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token){
-        try{
+    public String extractRole(String token) {
+        return extractAllClaims(token)
+                .get("role", String.class);
+    }
+
+    public boolean isTokenValid(String token) {
+
+        try {
             Date expirationDate =
                     extractAllClaims(token).getExpiration();
+
+            System.out.println("TOKEN GEÇERLİ");
+            System.out.println("BİTİŞ TARİHİ: " + expirationDate);
+
             return expirationDate.after(new Date());
-        }catch(JwtException | IllegalArgumentException exception){
+
+        } catch (JwtException | IllegalArgumentException exception) {
+
+            System.out.println(
+                    "TOKEN HATASI: " + exception.getMessage()
+            );
+
+            exception.printStackTrace();
+
             return false;
         }
     }
