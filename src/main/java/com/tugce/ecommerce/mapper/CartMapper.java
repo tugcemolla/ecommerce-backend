@@ -1,8 +1,13 @@
 package com.tugce.ecommerce.mapper;
 
 import com.tugce.ecommerce.dto.CartItemResponseDTO;
+import com.tugce.ecommerce.dto.CartResponseDTO;
+import com.tugce.ecommerce.entity.Cart;
 import com.tugce.ecommerce.entity.CartItem;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 public class CartMapper {
@@ -21,6 +26,19 @@ public class CartMapper {
                                         )//toplam fiyat hesaplama
                                 )
                 )
+                .build();
+    }
+    public CartResponseDTO tocartResponseDTO(Cart cart){
+        List<CartItemResponseDTO> itemDTOs = cart.getItems()
+                .stream()
+                .map(this::toResponseDTO)
+                .toList();
+        BigDecimal grandTotal = itemDTOs.stream()
+                .map(CartItemResponseDTO::getTotalprice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return CartResponseDTO.builder()
+                .items(itemDTOs)
+                .grandTotal(grandTotal)
                 .build();
     }
 }
