@@ -101,7 +101,6 @@ public class CartServiceImpl implements CartService {
         );
 
         cart.getItems().add(cartItem);
-
         return cartMapper.tocartResponseDTO(cart);
     }
 
