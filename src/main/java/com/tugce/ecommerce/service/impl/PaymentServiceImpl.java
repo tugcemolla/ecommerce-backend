@@ -8,6 +8,7 @@ import com.tugce.ecommerce.entity.Order;
 import com.tugce.ecommerce.entity.OrderStatus;
 import com.tugce.ecommerce.entity.Payment;
 import com.tugce.ecommerce.entity.PaymentStatus;
+import com.tugce.ecommerce.exception.ResourceNotFoundException;
 import com.tugce.ecommerce.mapper.PaymentMapper;
 import com.tugce.ecommerce.repository.OrderRepository;
 import com.tugce.ecommerce.repository.PaymentRepository;
@@ -27,7 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponseDTO makePayment(PaymentRequestDTO paymentRequestDTO){
         Order order = orderRepository.findById(paymentRequestDTO.getOrderId())
-                .orElseThrow(() -> new RuntimeException("Sipariş bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Sipariş bulunamadı."));
         Payment payment = Payment.builder()
                 .order(order)
                 .amount(order.getTotalAmount())

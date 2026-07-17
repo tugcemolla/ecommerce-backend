@@ -15,9 +15,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleProductNotFoundException(
-            ProductNotFoundException exception){
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException exception){
 
         Map<String, Object> errorResponse = new HashMap<>();
 

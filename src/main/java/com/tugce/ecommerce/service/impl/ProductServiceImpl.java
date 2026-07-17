@@ -3,7 +3,7 @@ package com.tugce.ecommerce.service.impl;
 import com.tugce.ecommerce.dto.ProductRequestDTO;
 import com.tugce.ecommerce.dto.ProductResponseDTO;
 import com.tugce.ecommerce.entity.Product;
-import com.tugce.ecommerce.exception.ProductNotFoundException;
+import com.tugce.ecommerce.exception.ResourceNotFoundException;
 import com.tugce.ecommerce.mapper.ProductMapper;
 import com.tugce.ecommerce.repository.ProductRepository;
 import com.tugce.ecommerce.service.ProductService;
@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO saveProduct(ProductRequestDTO requestDTO){
         Category category = categoryRepository.findById(requestDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Kategori bulunamadı."));
+                .orElseThrow(() ->  new ResourceNotFoundException("Kategori bulunamadı."));
         Product product = productMapper.toEntity(requestDTO);
         product.setCategory(category);
         Product savedProduct = productRepository.save(product);
@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO getProductById(Long id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün bulunamadı. ID: " + id));
         return productMapper.toResponseDTO(product);
     }
 
@@ -56,9 +56,9 @@ public class ProductServiceImpl implements ProductService {
             Long id,
             ProductRequestDTO requestDTO){
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün bulunamadı. ID: " + id));
         Category category = categoryRepository.findById(requestDTO.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Kategori bulunamadı."));
+                .orElseThrow(() ->  new ResourceNotFoundException("Kategori bulunamadı."));
         existingProduct.setName(requestDTO.getName());
         existingProduct.setDescription(requestDTO.getDescription());
         existingProduct.setPrice(requestDTO.getPrice());
@@ -73,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id){
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün bulunamadı. ID: " + id));
         productRepository.delete(product);
     }
 }

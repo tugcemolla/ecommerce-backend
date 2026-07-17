@@ -6,6 +6,7 @@ import com.tugce.ecommerce.entity.Cart;
 import com.tugce.ecommerce.entity.CartItem;
 import com.tugce.ecommerce.entity.Product;
 import com.tugce.ecommerce.entity.User;
+import com.tugce.ecommerce.exception.ResourceNotFoundException;
 import com.tugce.ecommerce.mapper.CartMapper;
 import com.tugce.ecommerce.repository.CartItemRepository;
 import com.tugce.ecommerce.repository.CartRepository;
@@ -34,10 +35,10 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDTO addToCart(String email, AddToCartRequestDTO requestDTO){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Product product = productRepository
                 .findById(requestDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("Ürün bulunamadı."));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün bulunamadı."));
         Cart cart = cartRepository.findByUser(user)
                 .orElseGet(() -> {
                     Cart newCart = Cart.builder()
@@ -72,9 +73,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDTO getCart(String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Sepet bulunamadı."));
+                .orElseThrow(() ->  new ResourceNotFoundException("Sepet bulunamadı."));
         return cartMapper.tocartResponseDTO(cart);
     }
 
@@ -84,14 +85,14 @@ public class CartServiceImpl implements CartService {
             throw new RuntimeException("Ürün adedi 0'dan büyük olmalıdır.");
         }
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Sepet bulunamadı"));
+                .orElseThrow(() ->  new ResourceNotFoundException("Sepet bulunamadı."));
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Ürün bulunamadı."));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün bulunamadı."));
         CartItem cartItem = cartItemRepository
                 .findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new RuntimeException("Ürün sepette bulunamadı"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün sepette bulunamadı."));
         cartItem.setQuantity(quantity);
         cartItemRepository.save(cartItem);
         cart.getItems().removeIf(
@@ -107,14 +108,14 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDTO removeFromCart(String email, Long productId){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Sepet bulunamadı."));
+                .orElseThrow(() -> new ResourceNotFoundException("Sepet bulunamadı."));
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Ürün bulunamadı."));
+                .orElseThrow(() -> new ResourceNotFoundException("Ürün bulunamadı."));
         CartItem cartItem = cartItemRepository
                 .findByCartAndProduct(cart, product)
-                .orElseThrow(() -> new RuntimeException("Ürün sepette bulunamadı."));
+                .orElseThrow(() ->  new ResourceNotFoundException("Ürün sepette bulunamadı."));
         cartItemRepository.delete(cartItem);
         cart.getItems().removeIf(
                 item -> item.getProduct()
@@ -127,9 +128,9 @@ public class CartServiceImpl implements CartService {
     @Override
     public void clearCart(String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Sepet bulunamadı."));
+                .orElseThrow(() -> new ResourceNotFoundException("Sepet bulunamadı."));
         cartItemRepository.deleteAll(cart.getItems());
         cart.getItems().clear();;
 

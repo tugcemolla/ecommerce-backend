@@ -2,6 +2,7 @@ package com.tugce.ecommerce.service.impl;
 
 import com.tugce.ecommerce.dto.CategoryDTO;
 import com.tugce.ecommerce.entity.Category;
+import com.tugce.ecommerce.exception.ResourceNotFoundException;
 import com.tugce.ecommerce.mapper.CategoryMapper;
 import com.tugce.ecommerce.repository.CategoryRepository;
 import com.tugce.ecommerce.service.CategoryService;
@@ -26,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO getCategoryById(Long id){
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Kategori bulunamadı."));
+                .orElseThrow(() ->  new ResourceNotFoundException("Kategori bulunamadı."));
 
        return CategoryMapper.toDTO(category);
     }
@@ -42,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO){
        Category category = categoryRepository.findById(id)
-               .orElseThrow(() -> new RuntimeException("Kategori bulunamadı."));
+               .orElseThrow(() ->  new ResourceNotFoundException("Kategori bulunamadı."));
        category.setName(categoryDTO.getName());
        Category updateCategory = categoryRepository.save(category);
        return CategoryMapper.toDTO(updateCategory);
@@ -51,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO deleteCategory(Long id){
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Kategori bulunamadı"));
+                .orElseThrow(() ->  new ResourceNotFoundException("Kategori bulunamadı."));
         categoryRepository.delete(category);
 
         return null;

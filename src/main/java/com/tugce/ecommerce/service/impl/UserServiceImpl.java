@@ -3,6 +3,7 @@ package com.tugce.ecommerce.service.impl;
 import com.tugce.ecommerce.dto.UserRequestDTO;
 import com.tugce.ecommerce.dto.UserResponseDTO;
 import com.tugce.ecommerce.entity.User;
+import com.tugce.ecommerce.exception.ResourceNotFoundException;
 import com.tugce.ecommerce.mapper.UserMapper;
 import com.tugce.ecommerce.repository.UserRepository;
 import com.tugce.ecommerce.service.UserService;
@@ -47,14 +48,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı Bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         return userMapper.toResponseDTO(user);
     }
 
     @Override
     public UserResponseDTO updateUser(Long id, UserRequestDTO userRequestDTO) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         existingUser.setFirstName(userRequestDTO.getFirstName());
         existingUser.setLastName(userRequestDTO.getLastName());
         existingUser.setEmail(userRequestDTO.getEmail());
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
 
         userRepository.delete(user);
     }

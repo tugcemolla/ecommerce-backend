@@ -3,6 +3,7 @@ package com.tugce.ecommerce.service.impl;
 import com.tugce.ecommerce.dto.OrderResponseDTO;
 import com.tugce.ecommerce.entity.Cart;
 import com.tugce.ecommerce.entity.User;
+import com.tugce.ecommerce.exception.ResourceNotFoundException;
 import com.tugce.ecommerce.mapper.OrderMapper;
 import com.tugce.ecommerce.repository.CartItemRepository;
 import com.tugce.ecommerce.repository.CartRepository;
@@ -46,9 +47,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDTO createOrder(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Sepet bulunamadı."));
+                .orElseThrow(() ->new ResourceNotFoundException("Sepet bulunamadı."));
         if(cart.getItems().isEmpty()){
             throw new RuntimeException("Sepet boş. Sipariş oluşturulamaz.");
         }
@@ -88,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponseDTO> getMyOrders(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
 
         return orderRepository
                 .findByUserOrderByCreatedAtDesc(user)
@@ -101,9 +102,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDTO getOrderById(String email, Long orderId) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Sipariş bulunamadı."));
+                .orElseThrow(() ->   new ResourceNotFoundException("Sipariş bulunamadı."));
         if(!order.getUser().getId().equals(user.getId())){
             throw new RuntimeException("Bu siparişi görüntüleme yetkiniz yok.");
         }
