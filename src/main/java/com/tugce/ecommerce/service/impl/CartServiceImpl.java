@@ -15,6 +15,7 @@ import com.tugce.ecommerce.repository.UserRepository;
 import com.tugce.ecommerce.service.CartService;
 import com.tugce.ecommerce.service.ProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -126,13 +127,21 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart(String email){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->   new ResourceNotFoundException("Kullanıcı bulunamadı."));
-        Cart cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Sepet bulunamadı."));
-        cartItemRepository.deleteAll(cart.getItems());
-        cart.getItems().clear();;
+    @Transactional
+    public void clearCart(String email) {
 
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Kullanıcı bulunamadı."));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Sepet bulunamadı."));
+
+        cartItemRepository.deleteAll(cart.getItems());
+
+        cart.getItems().clear();
+
+        cartRepository.save(cart);
     }
 }
