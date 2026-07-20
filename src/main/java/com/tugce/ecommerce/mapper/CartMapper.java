@@ -12,19 +12,24 @@ import java.util.List;
 @Component
 public class CartMapper {
     public CartItemResponseDTO toResponseDTO(CartItem cartItem){
+        boolean isGift = Boolean.TRUE.equals(cartItem.getGift());
+        BigDecimal totalPrice = isGift
+                ? null
+                : cartItem.getProduct()
+                  .getPrice()
+                  .multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+
         return CartItemResponseDTO.builder()
                 .productId(cartItem.getProduct().getId())
                 .productName(cartItem.getProduct().getName())
-                .price(cartItem.getProduct().getPrice())
+                .price(isGift ? null : cartItem.getProduct().getPrice())
                 .quantity(cartItem.getQuantity())
-                .totalprice(
-                        cartItem.getProduct()
-                                .getPrice()
-                                .multiply(
-                                        java.math.BigDecimal.valueOf(
-                                                cartItem.getQuantity()
-                                        )//toplam fiyat hesaplama
-                                )
+                .totalprice(totalPrice)
+                .gift(isGift)
+                .message(
+                        isGift
+                        ? "20.000 TL üzeri alışveriş hediyesi"
+                                : null
                 )
                 .build();
     }
@@ -34,7 +39,9 @@ public class CartMapper {
                 .map(this::toResponseDTO)
                 .toList();
         BigDecimal grandTotal = itemDTOs.stream()
+                .filter(item -> !Boolean.TRUE.equals(item.getGift()))
                 .map(CartItemResponseDTO::getTotalprice)
+                .filter(totalPrice -> totalPrice != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return CartResponseDTO.builder()
                 .items(itemDTOs)

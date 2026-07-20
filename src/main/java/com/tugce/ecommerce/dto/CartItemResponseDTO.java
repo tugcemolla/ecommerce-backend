@@ -15,4 +15,6 @@ public class CartItemResponseDTO {
     private BigDecimal price;
     private Integer quantity;
     private BigDecimal totalprice;
+    private Boolean gift;
+    private String message;
 }
