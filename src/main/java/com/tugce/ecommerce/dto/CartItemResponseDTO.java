@@ -10,11 +10,17 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class CartItemResponseDTO {
+
     private Long productId;
     private String productName;
+
+    private Long giftId;
+    private String giftName;
+
     private BigDecimal price;
     private Integer quantity;
-    private BigDecimal totalprice;
+    private BigDecimal totalPrice;
+
     private Boolean gift;
     private String message;
 }

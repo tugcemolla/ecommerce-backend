@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ecommerce-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: E-Commerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 5353
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d E-Commerce"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ecommerce-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: ecommerce-app
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/E-Commerce
+      DB_USERNAME: postgres
+      DB_PASSWORD: 5353
+
+volumes:
+  postgres-data:

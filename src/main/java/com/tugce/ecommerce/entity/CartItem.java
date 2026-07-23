@@ -2,7 +2,6 @@ package com.tugce.ecommerce.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 @Entity
 @Table(name = "cart_items")
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Builder
 public class CartItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,8 +21,12 @@ public class CartItem {
     private Cart cart;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "gift_id")
+    private Gift giftProduct;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -30,5 +34,4 @@ public class CartItem {
     @Column(nullable = false)
     @Builder.Default
     private Boolean gift = false;
-
 }
